@@ -150,7 +150,33 @@ Policy changes and payment co-signing reference keys the enterprise controls:
 
 No hardware is sold or required; bring the keys you already have.
 
-## 8. Feedback
+## 8. Multi-user & roles (planned v0.2)
+
+An enterprise gateway is operated by several people with different duties. Implementations
+SHOULD support the following minimal role model:
+
+| role | permissions |
+|---|---|
+| `admin` | write policies, register agent identities, manage users |
+| `approver` | approve / reject pending intents above the auto-approve threshold |
+| `operator` | register agents, view dashboards and reports |
+| `auditor` | read-only: audit chain, reports, policy history |
+
+Requirements:
+
+1. **Approvals are authenticated.** Every approval or rejection records an authenticated
+   principal; anonymous approvals are invalid and MUST fail chain verification semantics.
+2. **Policy changes are step-up protected.** Writing a policy requires `admin` plus the
+   configured key source (§7: webauthn step-up, KMS signature, …).
+3. **Two identity namespaces.** Human users (approvers, admins) and agent identities
+   (policy subjects) are separate. A policy binds agent pubkeys; an approval binds an
+   authenticated user principal. The audit chain records both.
+4. **Do not invent a user system.** Self-hosted deployments map roles onto the
+   enterprise's existing IdP (OIDC / SAML). When an IdP is configured, the gateway
+   MUST NOT store passwords. Local users are acceptable only for single-operator
+   deployments.
+
+## 9. Feedback
 
 Open an issue or propose fields via PR. The reference engine
 (`engine/gate_policy.py`) is the executable form of this document.
